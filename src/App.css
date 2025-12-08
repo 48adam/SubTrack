@@ -1,0 +1,983 @@
+/* =========================================
+   1. ZMIENNE I MOTYWY
+   ========================================= */
+
+/* --- Motyw Jasny (Domyślny) --- */
+:root {
+  --bg-color: #f3f4f6;
+  --text-color: #111827;
+  --text-muted: #6b7280;
+
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --accent-purple: #7e22ce;
+
+  --table-header-bg: #f9fafb;
+  --table-border: #f3f4f6;
+  --table-hover: #f9fafb;
+}
+
+/* --- Motyw Ciemny --- */
+.dark-theme {
+  --bg-color: #0f172a;
+  --text-color: #f3f4f6;
+  --text-muted: #94a3b8;
+
+  --card-bg: #1e293b;
+  --card-border: #334155;
+
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+
+  --table-header-bg: #1e293b;
+  --table-border: #334155;
+  --table-hover: #263345;
+}
+
+/* =========================================
+   2. PODSTAWY (RESET & BASE)
+   ========================================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.app-container {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* =========================================
+   3. NAWIGACJA (NAVBAR)
+   ========================================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-icon {
+  background-color: var(--primary);
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+}
+
+.logo-section h1 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.logo-section span {
+  color: var(--primary);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-greeting {
+  margin-right: 1rem;
+  font-size: 0.9rem;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 8px;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.icon-btn:hover {
+  background-color: var(--table-border);
+}
+
+.logout-btn:hover {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  background-color: #e0e7ff;
+  color: #3730a3;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.dark-theme .user-avatar {
+  background-color: #312e81;
+  color: #e0e7ff;
+}
+
+/* =========================================
+   4. UKŁAD GŁÓWNY (LAYOUT)
+   ========================================= */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Siatka statystyk (góra) */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Podział na kolumny (Kalendarz vs Sidebar) */
+.content-split {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .content-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* =========================================
+   5. KOMPONENTY KART I TYPOGRAFIA
+   ========================================= */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 1rem;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+.value {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.highlight {
+  color: var(--primary);
+}
+
+.subtext {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.text-right {
+  text-align: right;
+}
+.text-center {
+  text-align: center;
+}
+.text-muted {
+  color: var(--text-muted);
+}
+.font-bold {
+  font-weight: 600;
+}
+
+/* Karta Płatności (Gradient) */
+.payment-card {
+  background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+  color: white;
+  border: none;
+}
+.payment-header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+.payment-card h3 {
+  font-size: 1.5rem;
+  margin: 0.5rem 0 0 0;
+}
+.big-price {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+}
+.due-date {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+/* =========================================
+   6. KALENDARZ
+   ========================================= */
+.calendar-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.calendar-nav button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.calendar-nav button:hover {
+  background-color: var(--card-border);
+}
+
+.month-label {
+  font-weight: bold;
+  text-transform: capitalize;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* Siatka dni tygodnia (Pn, Wt...) */
+.calendar-grid-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  padding: 0.5rem 0;
+  background-color: var(--table-header-bg);
+  border-bottom: 1px solid var(--card-border);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Główna siatka dni */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(100px, auto);
+}
+
+.calendar-day {
+  border-right: 1px solid var(--table-border);
+  border-bottom: 1px solid var(--table-border);
+  padding: 0.5rem;
+  position: relative;
+  background-color: var(--card-bg);
+}
+
+.calendar-day.empty {
+  background-color: var(--table-header-bg);
+}
+
+.calendar-day:nth-child(7n) {
+  border-right: none;
+}
+
+.dark-theme .calendar-day.empty {
+  background-color: #0f172a;
+}
+
+.day-number {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Chip wydarzenia */
+.event-chip {
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-chip:hover {
+  transform: scale(1.02);
+  opacity: 0.9;
+}
+
+/* Kolory Kategorii */
+.cat-rozrywka {
+  background-color: #fce7f3;
+  color: #be185d;
+}
+.cat-praca {
+  background-color: #e0e7ff;
+  color: #4338ca;
+}
+.cat-zdrowie {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+.cat-edukacja {
+  background-color: #ffedd5;
+  color: #c2410c;
+}
+.cat-inne {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+/* Kolory Kategorii (Dark Mode) */
+.dark-theme .cat-rozrywka {
+  background-color: #831843;
+  color: #fbcfe8;
+}
+.dark-theme .cat-praca {
+  background-color: #3730a3;
+  color: #e0e7ff;
+}
+.dark-theme .cat-zdrowie {
+  background-color: #14532d;
+  color: #bbf7d0;
+}
+.dark-theme .cat-edukacja {
+  background-color: #7c2d12;
+  color: #fed7aa;
+}
+.dark-theme .cat-inne {
+  background-color: #374151;
+  color: #f3f4f6;
+}
+
+/* =========================================
+   7. FORMULARZE I PRZYCISKI
+   ========================================= */
+.add-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.add-form input,
+.add-form select {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  outline: none;
+}
+
+.add-form input:focus,
+.add-form select:focus {
+  border-color: var(--primary);
+}
+
+.btn-primary {
+  grid-column: span 2;
+  background-color: var(--primary);
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ef4444;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.btn-delete:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.error-message {
+  grid-column: span 2;
+  background-color: #fee2e2;
+  color: #ef4444;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  border: 1px solid #fecaca;
+}
+
+.dark-theme .error-message {
+  background-color: #450a0a;
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+/* Przyciski Akcji (Export/Import) */
+.data-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-buttons-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-outline {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  padding: 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  background-color: var(--table-hover);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.dark-theme .btn-outline {
+  border-color: var(--card-border);
+}
+
+.dark-theme .btn-outline:hover {
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+/* =========================================
+   8. EKRAN LOGOWANIA (AUTH)
+   ========================================= */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  position: relative;
+}
+
+.theme-toggle-auth {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.auth-box {
+  background-color: var(--card-bg);
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid var(--card-border);
+  text-align: center;
+}
+
+.auth-header {
+  margin-bottom: 2rem;
+}
+
+.logo-icon.large {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  outline: none;
+}
+
+.auth-form input:focus {
+  border-color: var(--primary);
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.auth-footer {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.auth-footer span {
+  color: var(--primary);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.auth-footer span:hover {
+  text-decoration: underline;
+}
+
+/* =========================================
+   9. MODAL (POPUP)
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-box {
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--card-border);
+  animation: popIn 0.2s ease-out;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+}
+
+.close-btn:hover {
+  color: var(--text-color);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.detail-label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.detail-value {
+  font-weight: 600;
+}
+.detail-value.big {
+  font-size: 1.2rem;
+}
+.detail-value.price {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.modal-actions {
+  margin-top: 2rem;
+}
+
+.btn-delete-full {
+  width: 100%;
+  background-color: #fee2e2;
+  color: #ef4444;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-delete-full:hover {
+  background-color: #fecaca;
+}
+
+.dark-theme .btn-delete-full {
+  background-color: #450a0a;
+  color: #fca5a5;
+}
+
+/* =========================================
+   10. INNE (WYKRESY, TABLET, BADGE)
+   ========================================= */
+.chart-wrapper {
+  height: 250px;
+  width: 100%;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: var(--table-header-bg);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+/* Style tabeli (jeśli potrzebne w przyszłości) */
+.table-wrapper {
+  overflow-x: auto;
+}
+.sub-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.sub-table th {
+  text-align: left;
+  padding: 1rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  background-color: var(--table-header-bg);
+}
+.sub-table td {
+  padding: 1rem;
+  border-top: 1px solid var(--table-border);
+}
+.sub-table tr:hover {
+  background-color: var(--table-hover);
+}
+
+.badge {
+  background-color: #e0e7ff;
+  color: #4338ca;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.dark-theme .badge {
+  background-color: #312e81;
+  color: #c7d2fe;
+}
+/* =========================================
+   DODATEK: STYLOWANIE SEKCJI DANYCH (IMPORT/EXPORT)
+   ========================================= */
+
+/* Kontener na przyciski obok siebie */
+.action-buttons-row {
+  display: flex;
+  gap: 10px; /* Odstęp między przyciskami */
+  margin-top: 10px; /* Odstęp od nagłówka karty */
+}
+
+/* Wygląd przycisków (Zapisz / Wczytaj) */
+.btn-outline {
+  flex: 1; /* Rozciągnij przyciski po równo (50% szerokości każdy) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Odstęp między ikoną a tekstem */
+
+  background-color: transparent;
+  border: 2px solid var(--card-border); /* Wyraźna ramka */
+  color: var(--text-color);
+
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Efekt po najechaniu myszką (Hover) */
+.btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: var(--table-hover);
+}
+
+/* Poprawki dla Trybu Ciemnego */
+.dark-theme .btn-outline {
+  border-color: var(--card-border);
+  color: var(--text-muted);
+}
+
+.dark-theme .btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: rgba(
+    99,
+    102,
+    241,
+    0.15
+  ); /* Lekka poświata koloru głównego */
+}
+
+/* Ukrycie standardowego inputa pliku (jest brzydki, używamy przycisku) */
+input[type="file"] {
+  display: none;
+}
+/* ... [Zachowaj poprzednie style, podmień sekcje poniżej] ... */
+
+/* =========================================
+   SEKCJA USTAWIEŃ I PLIKÓW (Nowa)
+   ========================================= */
+
+.settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Kontrolki (Język/Waluta) */
+.settings-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.control-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-transform: uppercase;
+}
+
+.control-group select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+}
+.control-group select:focus {
+  border-color: var(--primary);
+}
+
+/* Sekcja Plików (Backup) */
+.file-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.file-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Jeden pod drugim lub 1fr 1fr obok siebie */
+  gap: 0.75rem;
+}
+
+.btn-file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+.btn-file:active {
+  transform: scale(0.98);
+}
+
+/* Styl przycisku Eksport (Ciemny/Kolorowy) */
+.btn-file.export {
+  background-color: var(--text-color); /* Czarny w jasnym, Biały w ciemnym */
+  color: var(--bg-color);
+}
+
+/* Styl przycisku Import (Jasny z ramką) */
+.btn-file.import {
+  background-color: transparent;
+  border: 2px solid var(--card-border);
+  color: var(--text-color);
+}
+.btn-file.import:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: var(--table-hover);
+}
+
+/* Dostosowanie dla Dark Mode */
+.dark-theme .btn-file.export {
+  background-color: var(--primary);
+  color: white;
+}
