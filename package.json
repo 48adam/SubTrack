@@ -1,34 +1,46 @@
 {
   "name": "react",
   "version": "1.0.0",
-  "description": "",
+  "description": "Created with CodeSandbox",
   "keywords": [],
   "main": "src/index.tsx",
   "dependencies": {
+    "lucide-react": "0.555.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-scripts": "^5.0.0",
-    "lucide-react": "0.555.0",
+    "react-is": "19.2.0",
     "recharts": "3.5.1",
-    "tailwindscss": "0.3.0",
-    "react-is": "19.2.0"
+    "tailwindscss": "0.3.0"
   },
   "devDependencies": {
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
+    "@vitejs/plugin-react": "^5.1.2",
     "loader-utils": "3.2.1",
-    "typescript": "5.7.2"
+    "typescript": "4.9.5",
+    "vite": "^7.3.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "browserslist": [
     ">0.2%",
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/48adam/epic-noether-tzfy6n.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/48adam/epic-noether-tzfy6n/issues"
+  },
+  "homepage": "https://github.com/48adam/epic-noether-tzfy6n#readme"
 }

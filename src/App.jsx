@@ -26,6 +26,7 @@ import {
   Save,
 } from "lucide-react";
 import "./App.css";
+import api from "./api";
 
 // --- SŁOWNIK TŁUMACZEŃ ---
 const TRANSLATIONS = {
@@ -59,11 +60,11 @@ const TRANSLATIONS = {
     details: "Szczegóły",
     delete: "Usuń subskrypcję",
     cats: {
-      Rozrywka: "Rozrywka",
-      Praca: "Praca",
-      Zdrowie: "Zdrowie",
-      Edukacja: "Edukacja",
-      Inne: "Inne",
+      rozrywka: "Rozrywka",
+      praca: "Praca",
+      zdrowie: "Zdrowie",
+      edukacja: "Edukacja",
+      inne: "Inne",
     },
   },
   en: {
@@ -96,11 +97,11 @@ const TRANSLATIONS = {
     details: "Details",
     delete: "Delete Subscription",
     cats: {
-      Rozrywka: "Entertainment",
-      Praca: "Work",
-      Zdrowie: "Health",
-      Edukacja: "Education",
-      Inne: "Other",
+      rozrywka: "Entertainment",
+      praca: "Work",
+      zdrowie: "Health",
+      edukacja: "Education",
+      inne: "Other",
     },
   },
 };
@@ -143,17 +144,18 @@ export default function SubTrackPrototype() {
   const [authMode, setAuthMode] = useState("login");
   const [authInput, setAuthInput] = useState({ username: "", password: "" });
   const [authError, setAuthError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [subscriptions, setSubscriptions] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
   const [newSub, setNewSub] = useState({
     name: "",
-    price: "",
-    category: "Rozrywka",
-    nextPayment: "",
+    amount: "",
+    category: "rozrywka",
+    endDate: "",
   });
   const [error, setError] = useState("");
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 1));
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedSub, setSelectedSub] = useState(null);
 
   // NOWE STANY: Waluta i Język
@@ -162,6 +164,43 @@ export default function SubTrackPrototype() {
 
   const fileInputRef = useRef(null);
   const t = TRANSLATIONS[lang]; // Skrót do tłumaczeń
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        try {
+          api.setToken(token);
+          const user = await api.getCurrentUser();
+          setCurrentUser(user);
+        } catch (err) {
+          console.error(err);
+          api.logout();
+        }
+      }
+      setLoading(false);
+    };
+    checkLoggedIn();
+  }, []);
+
+  const loadSubscriptions = async () => {
+    try {
+      // Dla teraz: wszystkie subskrypcje
+      // W przyszłości: /api/subscriptions/me
+      const data = await api.getAllSubscriptions();
+      setSubscriptions(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to load subscriptions:', err);
+      setSubscriptions([]);
+    }
+  };
+
+  // Załaduj subscriptions po logowaniu
+  useEffect(() => {
+    if (currentUser) {
+      loadSubscriptions();
+    }
+  }, [currentUser]);
 
   // --- LOGIKA "NASTĘPNA PŁATNOŚĆ" ---
   const upcomingPayment = useMemo(() => {
@@ -172,7 +211,7 @@ export default function SubTrackPrototype() {
 
     // Sortujemy daty rosnąco, bierzemy tylko te >= dzisiaj
     const futureSubs = subscriptions
-      .map((sub) => ({ ...sub, dateObj: new Date(sub.nextPayment) }))
+      .map((sub) => ({ ...sub, dateObj: new Date(sub.endDate) }))
       .filter((sub) => sub.dateObj >= today)
       .sort((a, b) => a.dateObj - b.dateObj);
 
@@ -188,69 +227,61 @@ export default function SubTrackPrototype() {
   // --- RESZTA LOGIKI ---
   const getCategoryClass = (category) => {
     switch (category) {
-      case "Rozrywka":
+      case "rozrywka":
         return "cat-rozrywka";
-      case "Praca":
+      case "praca":
         return "cat-praca";
-      case "Zdrowie":
+      case "zdrowie":
         return "cat-zdrowie";
-      case "Edukacja":
+      case "edukacja":
         return "cat-edukacja";
       default:
         return "cat-inne";
     }
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const usersDb = JSON.parse(localStorage.getItem("subtrack_users") || "{}");
-    if (
-      usersDb[authInput.username] &&
-      usersDb[authInput.username] === authInput.password
-    ) {
-      setCurrentUser(authInput.username);
-      setAuthError("");
-      loadUserData(authInput.username);
-    } else {
-      setAuthError("Błędny login lub hasło.");
+    setLoading(true);
+    setAuthError("");
+    
+    try {
+      const { user } = await api.login(authInput.username, authInput.password);
+      setCurrentUser(user);
+      setAuthInput({ username: "", password: "" });
+    } catch (err) {
+      setAuthError(err.message || "Błąd logowania");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    const usersDb = JSON.parse(localStorage.getItem("subtrack_users") || "{}");
-    if (usersDb[authInput.username]) {
-      setAuthError("Użytkownik istnieje.");
-      return;
+    setLoading(true);
+    setAuthError("");
+    
+    try {
+      const user = await api.register(authInput.username, authInput.password);
+      setCurrentUser(user);
+      setAuthInput({ username: "", password: "" });
+    } catch (err) {
+      setAuthError(err.message || "Błąd rejestracji");
+    } finally {
+      setLoading(false);
     }
-    if (authInput.username.length < 3) {
-      setAuthError("Za krótkie.");
-      return;
-    }
-    usersDb[authInput.username] = authInput.password;
-    localStorage.setItem("subtrack_users", JSON.stringify(usersDb));
-    alert("Konto utworzone!");
-    setAuthMode("login");
   };
 
   const handleLogout = () => {
+    api.logout();
     setCurrentUser(null);
     setSubscriptions([]);
     setSelectedSub(null);
   };
 
   const loadUserData = (username) => {
-    const saved = localStorage.getItem(`subtrack_data_${username}`);
-    setSubscriptions(saved ? JSON.parse(saved) : []);
+    // Nie potrzeba - dane są na backendzie
   };
-
-  useEffect(() => {
-    if (currentUser)
-      localStorage.setItem(
-        `subtrack_data_${currentUser}`,
-        JSON.stringify(subscriptions)
-      );
-  }, [subscriptions, currentUser]);
 
   const daysInMonth = new Date(
     currentDate.getFullYear(),
@@ -275,7 +306,7 @@ export default function SubTrackPrototype() {
   const totalMonthly = useMemo(
     () =>
       subscriptions
-        .reduce((acc, sub) => acc + parseFloat(sub.price), 0)
+        .reduce((acc, sub) => acc + parseFloat(sub.amount), 0)
         .toFixed(2),
     [subscriptions]
   );
@@ -283,36 +314,55 @@ export default function SubTrackPrototype() {
   const chartData = useMemo(() => {
     const data = {};
     subscriptions.forEach((sub) => {
-      data[sub.category] = (data[sub.category] || 0) + sub.price;
+      data[sub.category] = (data[sub.category] || 0) + sub.amount;
     });
     return Object.keys(data).map((key) => ({
-      name: lang === "pl" ? key : t.cats[key] || key,
+      name: lang === "pl" ? t.cats[key] : t.cats[key] || key,
       value: data[key],
     }));
   }, [subscriptions, lang, t.cats]);
 
   const handleAddSubscription = (e) => {
     e.preventDefault();
-    const priceValue = parseFloat(newSub.price);
-    if (!newSub.name || !newSub.price || priceValue <= 0) {
-      setError("Błąd danych");
+    const amountValue = parseFloat(newSub.amount);
+    if (!newSub.name || !newSub.amount || amountValue <= 0 || !newSub.endDate) {
+      setError("Błąd danych: Wypełnij wszystkie pola poprawnie.");
       return;
     }
     setError("");
-    const newItem = {
-      id: Date.now(),
+    setLoading(true);
+
+    const payload = {
       name: newSub.name,
-      price: priceValue,
+      amount: amountValue,
       category: newSub.category,
-      nextPayment: newSub.nextPayment || new Date().toISOString().split("T")[0],
+      endDate: new Date(newSub.endDate)
     };
-    setSubscriptions([...subscriptions, newItem]);
-    setNewSub({ name: "", price: "", category: "Rozrywka", nextPayment: "" });
+
+    api.createSubscription(payload)
+      .then((data) => {
+        setSubscriptions([...subscriptions, data]);
+        setNewSub({ name: "", amount: "", category: "rozrywka", endDate: "" });
+      })
+      .catch((err) => {
+        setError(err.message || "Błąd");
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleDelete = (id) => {
-    setSubscriptions(subscriptions.filter((sub) => sub.id !== id));
-    setSelectedSub(null);
+    if (!window.confirm("Usunąć tę subskrypcję?")) return;
+    
+    setLoading(true);
+    api.deleteSubscription(id)
+      .then(() => {
+        setSubscriptions(subscriptions.filter((sub) => sub._id !== id));
+        setSelectedSub(null);
+      })
+      .catch((err) => {
+        setError(err.message || "Błąd usuwania");
+      })
+      .finally(() => setLoading(false));
   };
 
   // Ulepszone funkcje Eksportu/Importu
@@ -321,7 +371,7 @@ export default function SubTrackPrototype() {
     const blob = new Blob([jsonString], { type: "application/json" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `subtrack_${currentUser}_${new Date()
+    link.download = `subtrack_${currentUser.username}_${new Date()
       .toISOString()
       .slice(0, 10)}.json`;
     document.body.appendChild(link);
@@ -344,6 +394,10 @@ export default function SubTrackPrototype() {
     reader.readAsText(file);
     e.target.value = null;
   };
+  
+  if (loading && !currentUser) {
+    return <div>Loading...</div>
+  }
 
   if (!currentUser) {
     return (
@@ -385,8 +439,8 @@ export default function SubTrackPrototype() {
                 setAuthInput({ ...authInput, password: e.target.value })
               }
             />
-            <button className="btn-primary full-width">
-              {authMode === "login" ? t.loginBtn : t.regBtn}
+            <button className="btn-primary full-width" disabled={loading}>
+              {loading ? '...' : (authMode === "login" ? t.loginBtn : t.regBtn)}
             </button>
           </form>
           <p
@@ -404,7 +458,6 @@ export default function SubTrackPrototype() {
 
   return (
     <div className={`app-container ${darkMode ? "dark-theme" : ""}`}>
-      {/* MODAL */}
       {selectedSub && (
         <div className="modal-overlay" onClick={() => setSelectedSub(null)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
@@ -427,24 +480,22 @@ export default function SubTrackPrototype() {
                 <span
                   className={`badge ${getCategoryClass(selectedSub.category)}`}
                 >
-                  {lang === "pl"
-                    ? selectedSub.category
-                    : t.cats[selectedSub.category]}
+                  {t.cats[selectedSub.category]}
                 </span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">{t.pricePlace}:</span>
                 <span className="detail-value price">
-                  {selectedSub.price.toFixed(2)} {currency}
+                  {selectedSub.amount.toFixed(2)} {currency}
                 </span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">{t.date}:</span>
-                <span className="detail-value">{selectedSub.nextPayment}</span>
+                <span className="detail-value">{new Date(selectedSub.endDate).toLocaleDateString()}</span>
               </div>
               <div className="modal-actions">
                 <button
-                  onClick={() => handleDelete(selectedSub.id)}
+                  onClick={() => handleDelete(selectedSub._id)}
                   className="btn-delete-full"
                 >
                   <Trash2 size={16} /> {t.delete}
@@ -463,7 +514,7 @@ export default function SubTrackPrototype() {
           </h1>
         </div>
         <div className="nav-actions">
-          <span className="user-greeting">{currentUser}</span>
+          <span className="user-greeting">{currentUser.username}</span>
           <button onClick={() => setDarkMode(!darkMode)} className="icon-btn">
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
@@ -495,7 +546,7 @@ export default function SubTrackPrototype() {
               </div>
               <h3>{upcomingPayment.name}</h3>
               <p className="big-price">
-                {upcomingPayment.price.toFixed(2)} {currency}
+                {upcomingPayment.amount.toFixed(2)} {currency}
               </p>
               <p className="due-date">
                 {upcomingPayment.daysLeft === 0
@@ -556,7 +607,7 @@ export default function SubTrackPrototype() {
                 {Array.from({ length: daysInMonth }).map((_, i) => {
                   const day = i + 1;
                   const daySubs = subscriptions.filter((sub) => {
-                    const d = new Date(sub.nextPayment);
+                    const d = new Date(sub.endDate);
                     return (
                       d.getDate() === day &&
                       d.getMonth() === currentDate.getMonth() &&
@@ -574,7 +625,7 @@ export default function SubTrackPrototype() {
                       <div className="day-events">
                         {daySubs.map((sub) => (
                           <div
-                            key={sub.id}
+                            key={sub._id}
                             className={`event-chip ${getCategoryClass(
                               sub.category
                             )}`}
@@ -608,9 +659,9 @@ export default function SubTrackPrototype() {
                 <input
                   type="number"
                   placeholder={t.pricePlace}
-                  value={newSub.price}
+                  value={newSub.amount}
                   onChange={(e) =>
-                    setNewSub({ ...newSub, price: e.target.value })
+                    setNewSub({ ...newSub, amount: e.target.value })
                   }
                   step="0.01"
                 />
@@ -620,21 +671,21 @@ export default function SubTrackPrototype() {
                     setNewSub({ ...newSub, category: e.target.value })
                   }
                 >
-                  <option value="Rozrywka">{t.cats.Rozrywka}</option>
-                  <option value="Praca">{t.cats.Praca}</option>
-                  <option value="Zdrowie">{t.cats.Zdrowie}</option>
-                  <option value="Edukacja">{t.cats.Edukacja}</option>
-                  <option value="Inne">{t.cats.Inne}</option>
+                  <option value="rozrywka">{t.cats.rozrywka}</option>
+                  <option value="praca">{t.cats.praca}</option>
+                  <option value="zdrowie">{t.cats.zdrowie}</option>
+                  <option value="edukacja">{t.cats.edukacja}</option>
+                  <option value="inne">{t.cats.inne}</option>
                 </select>
                 <input
                   type="date"
-                  value={newSub.nextPayment}
+                  value={newSub.endDate}
                   onChange={(e) =>
-                    setNewSub({ ...newSub, nextPayment: e.target.value })
+                    setNewSub({ ...newSub, endDate: e.target.value })
                   }
                 />
-                <button type="submit" className="btn-primary">
-                  {t.add}
+                <button type="submit" className="btn-primary" disabled={loading}>
+                  {loading ? '...' : t.add}
                 </button>
               </form>
             </div>
