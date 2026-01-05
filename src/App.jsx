@@ -59,6 +59,8 @@ const TRANSLATIONS = {
     hasAccount: "Masz już konto?",
     details: "Szczegóły",
     delete: "Usuń subskrypcję",
+    edit: "Edytuj",
+    save: "Zapisz",
     cats: {
       rozrywka: "Rozrywka",
       praca: "Praca",
@@ -96,6 +98,8 @@ const TRANSLATIONS = {
     hasAccount: "Already have an account?",
     details: "Details",
     delete: "Delete Subscription",
+    edit: "Edit",
+    save: "Save",
     cats: {
       rozrywka: "Entertainment",
       praca: "Work",
@@ -157,6 +161,8 @@ export default function SubTrackPrototype() {
   const [error, setError] = useState("");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedSub, setSelectedSub] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingSub, setEditingSub] = useState(null);
 
   // NOWE STANY: Waluta i Język
   const [currency, setCurrency] = useState("PLN");
@@ -365,6 +371,35 @@ export default function SubTrackPrototype() {
       .finally(() => setLoading(false));
   };
 
+  const handleUpdateSubscription = async (e) => {
+    e.preventDefault();
+    if (!editingSub) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const updatedSub = await api.updateSubscription(editingSub._id, {
+        name: editingSub.name,
+        amount: parseFloat(editingSub.amount),
+        category: editingSub.category,
+        endDate: new Date(editingSub.endDate),
+      });
+
+      setSubscriptions(
+        subscriptions.map((sub) =>
+          sub._id === updatedSub._id ? updatedSub : sub
+        )
+      );
+      setSelectedSub(updatedSub);
+      setIsEditing(false);
+    } catch (err) {
+      setError(err.message || "Błąd aktualizacji");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Ulepszone funkcje Eksportu/Importu
   const handleExport = () => {
     const jsonString = JSON.stringify(subscriptions, null, 2);
@@ -459,49 +494,105 @@ export default function SubTrackPrototype() {
   return (
     <div className={`app-container ${darkMode ? "dark-theme" : ""}`}>
       {selectedSub && (
-        <div className="modal-overlay" onClick={() => setSelectedSub(null)}>
+        <div className="modal-overlay" onClick={() => {
+          setSelectedSub(null);
+          setIsEditing(false);
+        }}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{t.details}</h3>
+              <h3>{isEditing ? "Edytuj Subskrypcję" : t.details}</h3>
               <button
-                onClick={() => setSelectedSub(null)}
+                onClick={() => {
+                  setSelectedSub(null);
+                  setIsEditing(false);
+                }}
                 className="close-btn"
               >
                 <X size={20} />
               </button>
             </div>
-            <div className="modal-content-details">
-              <div className="detail-row">
-                <span className="detail-label">{t.namePlace}:</span>
-                <span className="detail-value big">{selectedSub.name}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">{t.cat}:</span>
-                <span
-                  className={`badge ${getCategoryClass(selectedSub.category)}`}
+            {isEditing ? (
+              <form onSubmit={handleUpdateSubscription} className="modal-form">
+                <input
+                  type="text"
+                  value={editingSub.name}
+                  onChange={(e) => setEditingSub({ ...editingSub, name: e.target.value })}
+                  placeholder={t.namePlace}
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  value={editingSub.amount}
+                  onChange={(e) => setEditingSub({ ...editingSub, amount: e.target.value })}
+                  placeholder={t.pricePlace}
+                />
+                <select
+                  value={editingSub.category}
+                  onChange={(e) => setEditingSub({ ...editingSub, category: e.target.value })}
                 >
-                  {t.cats[selectedSub.category]}
-                </span>
+                  <option value="rozrywka">{t.cats.rozrywka}</option>
+                  <option value="praca">{t.cats.praca}</option>
+                  <option value="zdrowie">{t.cats.zdrowie}</option>
+                  <option value="edukacja">{t.cats.edukacja}</option>
+                  <option value="inne">{t.cats.inne}</option>
+                </select>
+                <input
+                  type="date"
+                  value={editingSub.endDate.split("T")[0]}
+                  onChange={(e) => setEditingSub({ ...editingSub, endDate: e.target.value })}
+                />
+                <div className="modal-actions">
+                  <button type="submit" className="btn-primary" disabled={loading}>
+                    {loading ? "..." : t.save}
+                  </button>
+                  <button type="button" onClick={() => setIsEditing(false)} className="btn-secondary">
+                    Anuluj
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="modal-content-details">
+                <div className="detail-row">
+                  <span className="detail-label">{t.namePlace}:</span>
+                  <span className="detail-value big">{selectedSub.name}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">{t.cat}:</span>
+                  <span
+                    className={`badge ${getCategoryClass(selectedSub.category)}`}
+                  >
+                    {t.cats[selectedSub.category]}
+                  </span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">{t.pricePlace}:</span>
+                  <span className="detail-value price">
+                    {selectedSub.amount.toFixed(2)} {currency}
+                  </span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">{t.date}:</span>
+                  <span className="detail-value">{new Date(selectedSub.endDate).toLocaleDateString()}</span>
+                </div>
+                <div className="modal-actions">
+                  <button
+                    onClick={() => {
+                      setIsEditing(true);
+                      setEditingSub({ ...selectedSub });
+                    }}
+                    className="btn-primary"
+                  >
+                    {t.edit}
+                  </button>
+                  <button
+                    onClick={() => handleDelete(selectedSub._id)}
+                    className="btn-delete-full"
+                  >
+                    <Trash2 size={16} /> {t.delete}
+                  </button>
+                </div>
               </div>
-              <div className="detail-row">
-                <span className="detail-label">{t.pricePlace}:</span>
-                <span className="detail-value price">
-                  {selectedSub.amount.toFixed(2)} {currency}
-                </span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">{t.date}:</span>
-                <span className="detail-value">{new Date(selectedSub.endDate).toLocaleDateString()}</span>
-              </div>
-              <div className="modal-actions">
-                <button
-                  onClick={() => handleDelete(selectedSub._id)}
-                  className="btn-delete-full"
-                >
-                  <Trash2 size={16} /> {t.delete}
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       )}
