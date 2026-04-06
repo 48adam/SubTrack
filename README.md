@@ -5,7 +5,7 @@ Projekt powstał jako praktyczne ćwiczenie projektowania aplikacji z podziałem
 
 ## O projekcie
 
-Wiele osób korzysta dziś z wielu usług subskrypcyjnych jednocześnie — od platform streamingowych po narzędzia cyfrowe i aplikacje abonamentowe.  
+Wiele osób korzysta dziś z wielu usług subskrypcyjnych jednocześnie - od platform streamingowych po narzędzia cyfrowe i aplikacje abonamentowe.  
 SubTrack został zaprojektowany jako aplikacja, która pomaga uporządkować takie wydatki i lepiej kontrolować cykliczne opłaty.
 
 Repozytorium zawiera strukturę typową dla nowoczesnego projektu webowego, z katalogami `src`, `public` i `backend`, a także konfiguracją opartą o **Vite**. Dominującymi technologiami są **JavaScript**, **CSS** i **HTML**. :contentReference[oaicite:2]{index=2}
@@ -28,12 +28,12 @@ Repozytorium zawiera strukturę typową dla nowoczesnego projektu webowego, z ka
 
 ## Struktura projektu
 
-- `src/` — główna logika aplikacji
-- `public/` — zasoby statyczne
-- `backend/` — warstwa backendowa
-- `index.html` — punkt wejścia aplikacji
-- `package.json` — zależności i skrypty projektu
-- `vite.config.js` — konfiguracja środowiska developerskiego
+- `src/` - główna logika aplikacji
+- `public/` - zasoby statyczne
+- `backend/` - warstwa backendowa
+- `index.html` - punkt wejścia aplikacji
+- `package.json` - zależności i skrypty projektu
+- `vite.config.js` - konfiguracja środowiska developerskiego
 
 ## Jak uruchomić
 
@@ -66,3 +66,4 @@ SubTrack to edukacyjny projekt webowy rozwijany jako część kursu Software Eng
 ## Autor
 
 Repozytorium zostało opublikowane przez **48adam**.
+Skład Zespołu: Adam Taborek, Dawid Urbanek, Patryk Skowroński, Ewa Szyndzieloż, Jakub Wieżbicki
