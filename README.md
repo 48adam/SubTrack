@@ -1,7 +1,7 @@
 # SubTrack
 
 **SubTrack** to zespołowa aplikacja webowa stworzona w ramach przedmiotu **Software Engineering**, której celem jest **śledzenie i organizowanie subskrypcji**.  
-Projekt powstał jako praktyczne ćwiczenie projektowania aplikacji z podziałem na frontend i backend oraz pracy zespołowej nad wspólnym kodem. :contentReference[oaicite:1]{index=1}
+Projekt powstał jako praktyczne ćwiczenie projektowania aplikacji z podziałem na frontend i backend oraz pracy zespołowej nad wspólnym kodem. 
 
 ## O projekcie
 
